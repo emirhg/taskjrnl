@@ -121,6 +121,7 @@ def convert_jrnl_to_presenterm(
     result.append("---")
     result.append("options:")
     result.append("  implicit_slide_ends: true")
+    result.append("  end_slide_shorthand: true")
     result.append("---")
     result.append("")
 
