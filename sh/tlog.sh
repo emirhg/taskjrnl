@@ -16,11 +16,12 @@ function tlog(){
       local ARGS=(--short)
     fi
   else
-    if [[ -z "$@" ]]; then
+      if [[ -z "$@" || ( $# == 1 && $@ =~ ^[0-9]+$ ) ]]; then
         local PROJECT_TAGS="@${${ACTIVE_PROJECT// /-}//\./ @}"
         local JRNL_TEMPLATE=$(mktemp)
         local ARGS=(--template $JRNL_TEMPLATE)
-        local ID=$(task +ACTIVE limit:1 rc.report.next.columns=uuid rc.report.next.labels=uuid rc.verbose=nothing next)
+        local ID=$( [[ $# == 1 && $@ =~ ^[0-9]+$ ]] && task _get ${@}.uuid || task +ACTIVE limit:1 rc.report.next.columns=uuid rc.report.next.labels=uuid rc.verbose=nothing next)
+        echo "ID" $ID
         task _get ${ID}.description > $JRNL_TEMPLATE 
         local tags=$(task _get ${ID}.tags)
         if [[ -n "$tags" ]]; then
