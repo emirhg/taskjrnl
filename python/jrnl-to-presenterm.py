@@ -51,11 +51,27 @@ def format_entry(
     """
     result = []
 
+    # Cuerpo sin línea de etiquetas
+    body = entry.get("body", "")
+    clean_body = remove_tag_line(body)
+
+    has_cover = False
+    # Verificar si el cuerpo comienza con un nuevo slide
+    if clean_body:
+        lines = list(filter(lambda line: line.strip(), clean_body.split("\n", 2)))
+        if len(lines) > 1:
+            first_line, second_line = lines[0].strip(), lines[1].strip()
+            if first_line and all(c in "=-" for c in second_line):
+                result.append("<!-- jump_to_middle -->")
+                result.append("<!-- alignment: center -->")
+                has_cover = True
+
     # Título con separador
     title = entry.get("title", "Sin título")
     result.append(title)
     result.append(create_title_separator(title))
-    result.append("")  # Línea vacía después del separador
+    if not has_cover:
+        result.append("")  # Línea vacía después del separador
 
     # Fecha y hora si se solicitan
     if include_time or include_date:
@@ -70,9 +86,6 @@ def format_entry(
             result.append(f"**{datetime_str}**")
             result.append("")
 
-    # Cuerpo sin línea de etiquetas
-    body = entry.get("body", "")
-    clean_body = remove_tag_line(body)
     if clean_body:
         result.append(clean_body)
         result.append("")
