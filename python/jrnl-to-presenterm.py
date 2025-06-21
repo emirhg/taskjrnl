@@ -13,29 +13,27 @@ from typing import Dict, List, Any
 
 def remove_tag_line(body: str) -> str:
     """
-    Elimina la última línea si contiene solo etiquetas (@tag o #tag).
+    Elimina las líneas finales si contienen solo etiquetas (@tag o #tag).
     """
     lines = body.strip().split("\n")
     if not lines:
         return body
 
-    last_line = lines[-1].strip()
-    if not last_line:
-        return body
+    # Iterar desde el final eliminando líneas que contienen solo etiquetas
+    while lines:
+        last_line = lines[-1].strip()
+        if not last_line:
+            lines.pop()
+            continue
 
-    # Buscar patrones de etiquetas: palabras que empiecen con @ o #
-    words = last_line.split()
-    if not words:
-        return body
+        # Comprobar si todas las palabras en la línea son etiquetas
+        words = last_line.split()
+        if all(word.startswith("@") or word.startswith("#") for word in words):
+            lines.pop()
+        else:
+            break
 
-    # Verificar si todas las palabras son etiquetas
-    all_tags = all(word.startswith("@") or word.startswith("#") for word in words)
-
-    if all_tags:
-        # Eliminar la última línea
-        return "\n".join(lines[:-1]).strip()
-
-    return body
+    return "\n".join(lines).strip()
 
 
 def create_title_separator(title: str) -> str:
