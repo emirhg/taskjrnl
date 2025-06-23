@@ -18,6 +18,7 @@ alias dlnt='task `task nextid rc.verbose=nothing` del rc.confirmation=false rc.r
 alias dat='task activeid rc.verbose=nothing | xargs -rI{} -exec sh -c "task {} stop; task {} done"'           # Doned active task
 #alias dlat='task activeid rc.verbose=nothing | xargs -rI{} -exec sh -c "task {} stop; task {} del"'  # Doned active task
 alias sat='task activeid rc.verbose=nothing | xargs -rI{} -exec sh -c "task {} stop ; timew stop"' # stop active task
+alias st=start-tracked-task
 # task activeid rc.verbose=nothing | xargs -r sh -c 'task "$@" timew stop pomodoro; task "$@" stop'
 #
 alias pat='task `task activeid rc.verbose=nothing` timew stop pomodoro' # stop active task

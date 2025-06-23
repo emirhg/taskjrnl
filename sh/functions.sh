@@ -43,3 +43,12 @@ function task-summary() {
   fi
   unbuffer task summary rc.summary.all.projects:1 | grep --color=never -P "^(\e\[(48;5;234m|4m))?(\s$DEEP_LEVEL)?[A-z]" | tee >(echo $(($(wc -l) - 1)) "projects")
 }
+
+function start-tracked-task() {
+
+  if [[ $# == 1 ]]; then
+    task $@ timew start pomodoro
+  else
+    echo "No task specified"
+  fi
+}
