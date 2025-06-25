@@ -19,6 +19,7 @@ alias dat='task activeid rc.verbose=nothing | xargs -rI{} -exec sh -c "task {} s
 #alias dlat='task activeid rc.verbose=nothing | xargs -rI{} -exec sh -c "task {} stop; task {} del"'  # Doned active task
 alias sat='task activeid rc.verbose=nothing | xargs -rI{} -exec sh -c "task {} stop ; timew stop"' # stop active task
 alias st=start-tracked-task
+alias ntuuid="task next rc.report.next.columns:uuid rc.report.next.labels:uuid rc.verbose=nothing limit:1| grep --colour=never -oP '^\w{8}-\w{4}-\w{4}-\w{4}-\w{12}'"
 # task activeid rc.verbose=nothing | xargs -r sh -c 'task "$@" timew stop pomodoro; task "$@" stop'
 #
 alias pat='task `task activeid rc.verbose=nothing` timew stop pomodoro' # stop active task
