@@ -25,6 +25,7 @@ function parse_parameters(){
     fi
   done
 
+  PARAMS=("$@")
 }
 
 function tlog(){
@@ -35,28 +36,32 @@ function tlog(){
   echo "PARAMS=${PARAMS[*]}" >&2
 
 
-  local JRNL_PARAMS=(--config-override editor 'vi "+/^[[:space:]]*$/"')
+  local JRNL_PARAMS=(--config-override editor 'nvim --cmd "set filetype=markdown" "+/^[[:space:]]*$/"')
   local ACTIVE_PROJECT=$(task +ACTIVE limit:1 rc.report.next.columns=project rc.report.next.labels=Project rc.verbose=nothing next)
 
-  if [[ -z $ACTIVE_PROJECT ]]; then
+  if [[ -z "$ACTIVE_PROJECT" ]]; then
     if (($# > 0)); then
       local ACTIVE_PROJECT=$(task $@[1] limit:1 rc.report.next.columns=project rc.report.next.labels=Project rc.verbose=nothing next)
-      local PROJECT_TAGS="@${${ACTIVE_PROJECT// /-}//\./ -and @}"
-      shift
+          echo "Proyecto activo \"$ACTIVE_PROJECT\""
+      # local PROJECT_TAGS="@${${ACTIVE_PROJECT// /-}//\./ -and @}"
+      # shift
+        local PARAMS=(--template $JRNL_TEMPLATE)
+      
       if [[ -z "$@" ]]; then
-          local PARAMS=($(echo "$PROJECT_TAGS") --short)
+          local PARAMS=("--export" "json" $(echo "$PROJECT_TAGS") --short)
       else
-          local PARAMS=($(echo "$PROJECT_TAGS") $@)
+          local PARAMS=("--export" "json" $(echo "$PROJECT_TAGS") $@)
       fi
     else
       local PARAMS=(--short)
     fi
   else
-      if [[ -z "$@" || ( $# == 1 && $@ =~ ^[0-9]+$ ) ]]; then
+      if [[ -z "$@" || ( $# -ge 1 && $@[0] =~ ^[0-9]+$ ) ]]; then
         local PROJECT_TAGS="@${${ACTIVE_PROJECT// /-}//\./ @}"
         local JRNL_TEMPLATE=$(mktemp)
         local PARAMS=(--template $JRNL_TEMPLATE)
-        local ID=$( [[ $# == 1 && $@ =~ ^[0-9]+$ ]] && task _get ${@}.uuid || task +ACTIVE limit:1 rc.report.next.columns=uuid rc.report.next.labels=uuid rc.verbose=nothing next)
+
+        local ID=$( [[ $# -ge 1 && $@[0] =~ ^[0-9]+$ ]] && task _get ${@[0]}.uuid || task +ACTIVE limit:1 rc.report.next.columns=uuid rc.report.next.labels=uuid rc.verbose=nothing next)
         echo "ID" $ID >&2
         task _get ${ID}.description > $JRNL_TEMPLATE 
         local tags=$(task _get ${ID}.tags)
@@ -66,7 +71,7 @@ function tlog(){
         echo "\n@${ID}\n${PROJECT_TAGS}" >> $JRNL_TEMPLATE
     else
         local PROJECT_TAGS="@${${ACTIVE_PROJECT// /-}//\./ -and @}"
-        local PARAMS=($(echo "$PROJECT_TAGS") $@)
+        local PARAMS=($(echo "$PROJECT_TAGS") "$@")
     fi
   fi
 
